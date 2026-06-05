@@ -1,3 +1,5 @@
 /.agents
 /.codex
 /.vscode
+/target
+/.settings
