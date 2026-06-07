@@ -18,6 +18,8 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,6 +33,9 @@ public class StudentManagerApp extends JFrame {
     private final JTextField nameField;
     private final JTextField emailField;
     private final JTextField courseField;
+    private final JTextField searchField;
+    private JButton saveButton;
+    private int editingId = -1;
 
     public StudentManagerApp() {
         super("Student Manager");
@@ -57,7 +62,7 @@ public class StudentManagerApp extends JFrame {
         addRow(formPanel, gbc, 1, "Email", emailField);
         addRow(formPanel, gbc, 2, "Course", courseField);
 
-        JButton saveButton = new JButton("Save Student");
+        saveButton = new JButton("Save Student");
         saveButton.addActionListener(e -> addStudent());
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -82,10 +87,31 @@ public class StudentManagerApp extends JFrame {
         refreshButton.addActionListener(e -> loadStudents());
         JButton deleteButton = new JButton("Delete Selected");
         deleteButton.addActionListener(e -> deleteSelectedStudent());
+        JButton editButton = new JButton("Edit Selected");
+        editButton.addActionListener(e -> editSelectedStudent());
+        JButton clearFormButton = new JButton("Clear Form");
+        clearFormButton.addActionListener(e -> clearForm());
         actionsPanel.add(refreshButton);
         actionsPanel.add(deleteButton);
+        actionsPanel.add(editButton);
+        actionsPanel.add(clearFormButton);
 
-        content.add(formPanel, BorderLayout.NORTH);
+        // Search panel above the form
+        JPanel searchPanel = new JPanel();
+        searchField = new JTextField(18);
+        JButton searchButton = new JButton("Search by Name");
+        searchButton.addActionListener(e -> searchStudents());
+        JButton clearSearchButton = new JButton("Clear Search");
+        clearSearchButton.addActionListener(e -> { searchField.setText(""); loadStudents(); });
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        searchPanel.add(clearSearchButton);
+
+        JPanel northPanel = new JPanel(new BorderLayout());
+        northPanel.add(searchPanel, BorderLayout.NORTH);
+        northPanel.add(formPanel, BorderLayout.CENTER);
+
+        content.add(northPanel, BorderLayout.NORTH);
         content.add(tableScrollPane, BorderLayout.CENTER);
         content.add(actionsPanel, BorderLayout.SOUTH);
 
@@ -113,11 +139,24 @@ public class StudentManagerApp extends JFrame {
             return;
         }
 
+        // simple email validation
+        Pattern emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+        Matcher matcher = emailPattern.matcher(email);
+        if (!matcher.matches()) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         try {
-            studentDAO.insert(new Student(0, name, email, course));
+            if (editingId > 0) {
+                studentDAO.update(new Student(editingId, name, email, course));
+                JOptionPane.showMessageDialog(this, "Student updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                studentDAO.insert(new Student(0, name, email, course));
+                JOptionPane.showMessageDialog(this, "Student saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            }
             clearForm();
             loadStudents();
-            JOptionPane.showMessageDialog(this, "Student saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (RuntimeException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -166,6 +205,54 @@ public class StudentManagerApp extends JFrame {
         nameField.setText("");
         emailField.setText("");
         courseField.setText("");
+        editingId = -1;
+        if (saveButton != null) {
+            saveButton.setText("Save Student");
+        }
+    }
+
+    private void editSelectedStudent() {
+        int selectedRow = studentTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a student to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int id = (Integer) tableModel.getValueAt(selectedRow, 0);
+        String name = (String) tableModel.getValueAt(selectedRow, 1);
+        String email = (String) tableModel.getValueAt(selectedRow, 2);
+        String course = (String) tableModel.getValueAt(selectedRow, 3);
+
+        editingId = id;
+        nameField.setText(name);
+        emailField.setText(email);
+        courseField.setText(course);
+        if (saveButton != null) {
+            saveButton.setText("Update Student");
+        }
+    }
+
+    private void searchStudents() {
+        String q = searchField.getText().trim();
+        if (q.isEmpty()) {
+            loadStudents();
+            return;
+        }
+
+        try {
+            List<Student> students = studentDAO.findByName(q);
+            tableModel.setRowCount(0);
+            for (Student student : students) {
+                tableModel.addRow(new Object[]{
+                    student.getId(),
+                    student.getName(),
+                    student.getEmail(),
+                    student.getCourse()
+                });
+            }
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void main(String[] args) {

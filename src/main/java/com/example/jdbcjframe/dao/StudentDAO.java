@@ -61,4 +61,44 @@ public class StudentDAO {
             throw new RuntimeException("Failed to delete student", e);
         }
     }
+
+    public void update(Student student) {
+        String sql = "UPDATE students SET name = ?, email = ?, course = ? WHERE id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, student.getName());
+            statement.setString(2, student.getEmail());
+            statement.setString(3, student.getCourse());
+            statement.setInt(4, student.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update student", e);
+        }
+    }
+
+    public List<Student> findByName(String name) {
+        List<Student> students = new ArrayList<>();
+        String sql = "SELECT id, name, email, course FROM students WHERE name LIKE ? ORDER BY id DESC";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, "%" + name + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    students.add(new Student(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("course")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to search students", e);
+        }
+        return students;
+    }
 }
