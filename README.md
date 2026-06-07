@@ -47,7 +47,7 @@ A simple Java desktop application built with:
 
 1. Open the project root in IntelliJ.
 2. Let IntelliJ import it as a Maven project.
-3. Run `com.example.jdbcjsp.ui.StudentManagerApp`.
+3. Run `com.example.jdbcjframe.ui.StudentManagerApp`.
 
 ## UI Flow
 

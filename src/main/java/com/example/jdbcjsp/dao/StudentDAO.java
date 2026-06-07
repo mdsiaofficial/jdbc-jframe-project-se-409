@@ -1,7 +1,7 @@
-package com.example.jdbcjsp.dao;
+package com.example.jdbcjframe.dao;
 
-import com.example.jdbcjsp.model.Student;
-import com.example.jdbcjsp.util.DBConnection;
+import com.example.jdbcjframe.model.Student;
+import com.example.jdbcjframe.util.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

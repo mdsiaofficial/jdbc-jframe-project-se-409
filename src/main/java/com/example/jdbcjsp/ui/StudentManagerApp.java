@@ -1,7 +1,7 @@
-package com.example.jdbcjsp.ui;
+package com.example.jdbcjframe.ui;
 
-import com.example.jdbcjsp.dao.StudentDAO;
-import com.example.jdbcjsp.model.Student;
+import com.example.jdbcjframe.dao.StudentDAO;
+import com.example.jdbcjframe.model.Student;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;

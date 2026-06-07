@@ -1,4 +1,4 @@
-package com.example.jdbcjsp.model;
+package com.example.jdbcjframe.model;
 
 public class Student {
     private int id;

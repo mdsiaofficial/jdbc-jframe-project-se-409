@@ -1,4 +1,4 @@
-package com.example.jdbcjsp.util;
+package com.example.jdbcjframe.util;
 
 import java.io.IOException;
 import java.io.InputStream;
