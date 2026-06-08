@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.Properties;
 
 public final class DBConnection {
-    private static final String DEFAULT_URL = "jdbc:mysql://localhost:3306/student_management_jdbc_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String DEFAULT_URL = "jdbc:mysql://localhost:3306/student_manager_jdbc_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String DEFAULT_USER = "root";
     private static final String DEFAULT_PASSWORD = "";
     private static final String PROPERTIES_FILE = "/db.properties";

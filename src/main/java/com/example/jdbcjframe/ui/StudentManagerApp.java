@@ -38,44 +38,125 @@ public class StudentManagerApp extends JFrame {
     private final JTextField emailField;
     private final JTextField courseField;
     private final JTextField searchField;
+    private JLabel totalStudentsLabel;
     private JButton saveButton;
     private int editingId = -1;
 
     public StudentManagerApp() {
-        super("Basic JDBC Student Manager by Shoriful 1010");
+        super("Student Manager");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(1920, 1080);
+        setSize(1100, 720);
         setLocationRelativeTo(null);
 
-        JPanel content = new JPanel(new BorderLayout(28, 28));
-        content.setBorder(new EmptyBorder(24, 24, 24, 24));
+        Font titleFont = new Font(Font.SANS_SERIF, Font.BOLD, 30);
+        Font headerFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+        Font bodyFont = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
+        setUIFont(bodyFont);
+
+        JPanel content = new JPanel(new BorderLayout(16, 16));
+        content.setBorder(new EmptyBorder(18, 18, 18, 18));
+        content.setBackground(new Color(240, 245, 250));
         setContentPane(content);
 
-        Font appFont = new Font(Font.SANS_SERIF, Font.PLAIN, 28);
-        setUIFont(appFont);
+        JLabel titleLabel = new JLabel("Student Manager");
+        titleLabel.setFont(titleFont);
+        titleLabel.setForeground(new Color(22, 93, 132));
+
+        JLabel subtitleLabel = new JLabel("Add, search, edit and organize student records with ease.");
+        subtitleLabel.setFont(headerFont);
+        subtitleLabel.setForeground(new Color(80, 100, 120));
+
+        JPanel headerPanel = new JPanel(new BorderLayout(0, 8));
+        headerPanel.setOpaque(false);
+        headerPanel.add(titleLabel, BorderLayout.NORTH);
+        headerPanel.add(subtitleLabel, BorderLayout.SOUTH);
+
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(12, 12, 12, 12);
+        gbc.fill = GridBagConstraints.BOTH;
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Add Student"));
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 210, 220), 1),
+            BorderFactory.createEmptyBorder(16, 16, 16, 16)
+        ));
+        formPanel.setBackground(Color.WHITE);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(18, 18, 18, 18);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JLabel formTitle = new JLabel("Student Details");
+        formTitle.setFont(headerFont);
+        formTitle.setForeground(new Color(24, 87, 129));
 
-        nameField = new JTextField(30);
-        emailField = new JTextField(30);
-        courseField = new JTextField(30);
+        nameField = new JTextField(36);
+        emailField = new JTextField(36);
+        courseField = new JTextField(36);
 
-        addRow(formPanel, gbc, 0, "Name", nameField);
-        addRow(formPanel, gbc, 1, "Email", emailField);
-        addRow(formPanel, gbc, 2, "Course", courseField);
+        GridBagConstraints formGbc = new GridBagConstraints();
+        formGbc.insets = new Insets(10, 10, 10, 10);
+        formGbc.fill = GridBagConstraints.HORIZONTAL;
+        formGbc.gridx = 0;
+        formGbc.gridy = 0;
+        formGbc.gridwidth = 2;
+        formPanel.add(formTitle, formGbc);
 
-        saveButton = new JButton("Save Student");
+        formGbc.gridwidth = 1;
+        formGbc.gridy++;
+        formGbc.gridx = 0;
+        formPanel.add(new JLabel("Name"), formGbc);
+        formGbc.gridx = 1;
+        formPanel.add(nameField, formGbc);
+
+        formGbc.gridy++;
+        formGbc.gridx = 0;
+        formPanel.add(new JLabel("Email"), formGbc);
+        formGbc.gridx = 1;
+        formPanel.add(emailField, formGbc);
+
+        formGbc.gridy++;
+        formGbc.gridx = 0;
+        formPanel.add(new JLabel("Course"), formGbc);
+        formGbc.gridx = 1;
+        formPanel.add(courseField, formGbc);
+
+        saveButton = createButton("Save Student", new Color(22, 93, 132), Color.WHITE);
         saveButton.addActionListener(e -> addStudent());
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(22, 18, 18, 18);
-        formPanel.add(saveButton, gbc);
+        formGbc.gridy++;
+        formGbc.gridx = 0;
+        formGbc.gridwidth = 2;
+        formGbc.anchor = GridBagConstraints.CENTER;
+        formPanel.add(saveButton, formGbc);
+
+        JPanel tableCard = new JPanel(new BorderLayout(12, 12));
+        tableCard.setBackground(Color.WHITE);
+        tableCard.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 210, 220), 1),
+            BorderFactory.createEmptyBorder(16, 16, 16, 16)
+        ));
+
+        JPanel searchPanel = new JPanel(new GridBagLayout());
+        searchPanel.setBackground(Color.WHITE);
+        searchField = new JTextField(28);
+        JButton searchButton = createButton("Search", new Color(0, 120, 145), Color.WHITE);
+        searchButton.addActionListener(e -> searchStudents());
+        JButton clearSearchButton = createButton("Clear", new Color(190, 200, 210), new Color(45, 60, 75));
+        clearSearchButton.addActionListener(e -> {
+            searchField.setText("");
+            loadStudents();
+        });
+
+        GridBagConstraints searchGbc = new GridBagConstraints();
+        searchGbc.insets = new Insets(6, 6, 6, 6);
+        searchGbc.fill = GridBagConstraints.HORIZONTAL;
+        searchGbc.gridx = 0;
+        searchPanel.add(new JLabel("Search by name"), searchGbc);
+        searchGbc.gridx = 1;
+        searchPanel.add(searchField, searchGbc);
+        searchGbc.gridx = 2;
+        searchGbc.weightx = 0;
+        searchPanel.add(searchButton, searchGbc);
+        searchGbc.gridx = 3;
+        searchPanel.add(clearSearchButton, searchGbc);
 
         tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Email", "Course"}, 0) {
             @Override
@@ -86,52 +167,78 @@ public class StudentManagerApp extends JFrame {
 
         studentTable = new JTable(tableModel);
         studentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane tableScrollPane = new JScrollPane(studentTable);
-        tableScrollPane.setBorder(BorderFactory.createTitledBorder("Saved Students"));
-
-        JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 28, 20));
-        JButton refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(e -> loadStudents());
-        JButton deleteButton = new JButton("Delete Selected");
-        deleteButton.addActionListener(e -> deleteSelectedStudent());
-        JButton editButton = new JButton("Edit Selected");
-        editButton.addActionListener(e -> editSelectedStudent());
-        JButton clearFormButton = new JButton("Clear Form");
-        clearFormButton.addActionListener(e -> clearForm());
-        actionsPanel.add(refreshButton);
-        actionsPanel.add(deleteButton);
-        actionsPanel.add(editButton);
-        actionsPanel.add(clearFormButton);
-
-        // Search panel above the form
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 28, 20));
-        searchField = new JTextField(30);
-        JButton searchButton = new JButton("Search by Name");
-        searchButton.addActionListener(e -> searchStudents());
-        JButton clearSearchButton = new JButton("Clear Search");
-        clearSearchButton.addActionListener(e -> { searchField.setText(""); loadStudents(); });
-        searchPanel.add(searchField);
-        searchPanel.add(searchButton);
-        searchPanel.add(clearSearchButton);
-
-        studentTable.setRowHeight(42);
-        studentTable.getTableHeader().setFont(appFont.deriveFont(Font.BOLD, 26));
-        studentTable.getTableHeader().setPreferredSize(new Dimension(0, 56));
-        studentTable.getTableHeader().setBackground(Color.RED);
+        studentTable.setRowHeight(28);
+        studentTable.setAutoCreateRowSorter(true);
+        studentTable.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        studentTable.getTableHeader().setBackground(new Color(22, 93, 132));
         studentTable.getTableHeader().setForeground(Color.WHITE);
-        studentTable.getTableHeader().setOpaque(true);
+        studentTable.getTableHeader().setFont(bodyFont.deriveFont(Font.BOLD, 16f));
+        studentTable.setFont(bodyFont);
 
-        applyFontToComponent(content, appFont);
+        JScrollPane tableScrollPane = new JScrollPane(studentTable);
+        tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        tableScrollPane.setPreferredSize(new Dimension(0, 360));
 
-        JPanel northPanel = new JPanel(new BorderLayout());
-        northPanel.add(searchPanel, BorderLayout.NORTH);
-        northPanel.add(formPanel, BorderLayout.CENTER);
+        JPanel tableHeaderPanel = new JPanel(new BorderLayout());
+        tableHeaderPanel.setOpaque(false);
+        JLabel tableTitle = new JLabel("Saved Students");
+        tableTitle.setFont(headerFont);
+        tableTitle.setForeground(new Color(24, 87, 129));
+        tableHeaderPanel.add(tableTitle, BorderLayout.WEST);
 
-        content.add(northPanel, BorderLayout.NORTH);
-        content.add(tableScrollPane, BorderLayout.CENTER);
-        content.add(actionsPanel, BorderLayout.SOUTH);
+        JLabel totalStudentsLabel = new JLabel("Total students: 0");
+        totalStudentsLabel.setFont(bodyFont);
+        totalStudentsLabel.setForeground(new Color(80, 100, 120));
+        tableHeaderPanel.add(totalStudentsLabel, BorderLayout.EAST);
 
+        JPanel tableTopPanel = new JPanel(new BorderLayout(0, 8));
+        tableTopPanel.setOpaque(false);
+        tableTopPanel.add(tableHeaderPanel, BorderLayout.NORTH);
+        tableTopPanel.add(searchPanel, BorderLayout.SOUTH);
+
+        tableCard.add(tableTopPanel, BorderLayout.NORTH);
+        tableCard.add(tableScrollPane, BorderLayout.CENTER);
+
+        JPanel actionButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 14, 10));
+        actionButtonsPanel.setOpaque(false);
+        JButton editButton = createButton("Edit", new Color(18, 123, 167), Color.WHITE);
+        editButton.addActionListener(e -> editSelectedStudent());
+        JButton deleteButton = createButton("Delete", new Color(219, 57, 57), Color.WHITE);
+        deleteButton.addActionListener(e -> deleteSelectedStudent());
+        JButton refreshButton = createButton("Refresh", new Color(22, 93, 132), Color.WHITE);
+        refreshButton.addActionListener(e -> loadStudents());
+        JButton clearFormButton = createButton("Clear", new Color(190, 200, 210), new Color(45, 60, 75));
+        clearFormButton.addActionListener(e -> clearForm());
+        actionButtonsPanel.add(editButton);
+        actionButtonsPanel.add(deleteButton);
+        actionButtonsPanel.add(refreshButton);
+        actionButtonsPanel.add(clearFormButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.33;
+        gbc.weighty = 1.0;
+        mainPanel.add(formPanel, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.67;
+        mainPanel.add(tableCard, gbc);
+
+        content.add(headerPanel, BorderLayout.NORTH);
+        content.add(mainPanel, BorderLayout.CENTER);
+        content.add(actionButtonsPanel, BorderLayout.SOUTH);
+
+        this.totalStudentsLabel = totalStudentsLabel;
         loadStudents();
+    }
+
+    private JButton createButton(String text, Color bg, Color fg) {
+        JButton button = new JButton(text);
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        return button;
     }
 
     private void addRow(JPanel panel, GridBagConstraints gbc, int row, String label, JTextField field) {
@@ -232,6 +339,9 @@ public class StudentManagerApp extends JFrame {
                     student.getEmail(),
                     student.getCourse()
                 });
+            }
+            if (totalStudentsLabel != null) {
+                totalStudentsLabel.setText("Total students: " + students.size());
             }
         } catch (RuntimeException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
