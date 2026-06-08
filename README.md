@@ -21,7 +21,7 @@ A simple Java desktop application built with:
 
 1. Install Java 11+, Maven, and MySQL.
 2. Start MySQL in XAMPP.
-3. Create a MySQL database named `jdbc_jframe_db` in phpMyAdmin.
+3. Create a MySQL database named `student_management_jdbc_db` in phpMyAdmin.
 4. Check `src/main/resources/db.properties` for your MySQL settings.
 5. Build the project:
    ```bash
