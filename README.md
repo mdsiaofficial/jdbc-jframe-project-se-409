@@ -1,4 +1,4 @@
-# JDBC Swing Student Manager
+# Basic JDBC Student Manager
 
 A simple Java desktop application built with:
 

@@ -21,6 +21,10 @@ import javax.swing.table.DefaultTableModel;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -38,25 +42,28 @@ public class StudentManagerApp extends JFrame {
     private int editingId = -1;
 
     public StudentManagerApp() {
-        super("Student Manager");
+        super("Basic JDBC Student Manager by Shoriful 1010");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(860, 560);
+        setSize(1920, 1080);
         setLocationRelativeTo(null);
 
-        JPanel content = new JPanel(new BorderLayout(16, 16));
-        content.setBorder(new EmptyBorder(16, 16, 16, 16));
+        JPanel content = new JPanel(new BorderLayout(28, 28));
+        content.setBorder(new EmptyBorder(24, 24, 24, 24));
         setContentPane(content);
+
+        Font appFont = new Font(Font.SANS_SERIF, Font.PLAIN, 28);
+        setUIFont(appFont);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Add Student"));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(18, 18, 18, 18);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        nameField = new JTextField(18);
-        emailField = new JTextField(18);
-        courseField = new JTextField(18);
+        nameField = new JTextField(30);
+        emailField = new JTextField(30);
+        courseField = new JTextField(30);
 
         addRow(formPanel, gbc, 0, "Name", nameField);
         addRow(formPanel, gbc, 1, "Email", emailField);
@@ -67,7 +74,7 @@ public class StudentManagerApp extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(12, 8, 8, 8);
+        gbc.insets = new Insets(22, 18, 18, 18);
         formPanel.add(saveButton, gbc);
 
         tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Email", "Course"}, 0) {
@@ -82,7 +89,7 @@ public class StudentManagerApp extends JFrame {
         JScrollPane tableScrollPane = new JScrollPane(studentTable);
         tableScrollPane.setBorder(BorderFactory.createTitledBorder("Saved Students"));
 
-        JPanel actionsPanel = new JPanel();
+        JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 28, 20));
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> loadStudents());
         JButton deleteButton = new JButton("Delete Selected");
@@ -97,8 +104,8 @@ public class StudentManagerApp extends JFrame {
         actionsPanel.add(clearFormButton);
 
         // Search panel above the form
-        JPanel searchPanel = new JPanel();
-        searchField = new JTextField(18);
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 28, 20));
+        searchField = new JTextField(30);
         JButton searchButton = new JButton("Search by Name");
         searchButton.addActionListener(e -> searchStudents());
         JButton clearSearchButton = new JButton("Clear Search");
@@ -106,6 +113,15 @@ public class StudentManagerApp extends JFrame {
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
         searchPanel.add(clearSearchButton);
+
+        studentTable.setRowHeight(42);
+        studentTable.getTableHeader().setFont(appFont.deriveFont(Font.BOLD, 26));
+        studentTable.getTableHeader().setPreferredSize(new Dimension(0, 56));
+        studentTable.getTableHeader().setBackground(Color.RED);
+        studentTable.getTableHeader().setForeground(Color.WHITE);
+        studentTable.getTableHeader().setOpaque(true);
+
+        applyFontToComponent(content, appFont);
 
         JPanel northPanel = new JPanel(new BorderLayout());
         northPanel.add(searchPanel, BorderLayout.NORTH);
@@ -127,6 +143,27 @@ public class StudentManagerApp extends JFrame {
 
         gbc.gridx = 1;
         panel.add(field, gbc);
+    }
+
+    private void setUIFont(Font font) {
+        UIManager.put("Label.font", font);
+        UIManager.put("Button.font", font);
+        UIManager.put("TextField.font", font);
+        UIManager.put("Table.font", font);
+        UIManager.put("TableHeader.font", font.deriveFont(Font.BOLD, font.getSize()));
+        UIManager.put("TitledBorder.font", font.deriveFont(Font.BOLD, font.getSize()));
+        UIManager.put("Panel.font", font);
+        UIManager.put("OptionPane.messageFont", font);
+        UIManager.put("OptionPane.buttonFont", font);
+    }
+
+    private void applyFontToComponent(java.awt.Component component, Font font) {
+        component.setFont(font);
+        if (component instanceof java.awt.Container) {
+            for (java.awt.Component child : ((java.awt.Container) component).getComponents()) {
+                applyFontToComponent(child, font);
+            }
+        }
     }
 
     private void addStudent() {
